@@ -32,8 +32,8 @@ app.post("/message", async (req, res) => {
   }
 });
 
-const sendMessage = (job) => {
-  console.log(job.data);
-};
+// const sendMessage = (job:any) => {
+//   console.log(job.data);
+// };
 
-new Worker("messageQ", sendMessage,{connection:redisConnection});
+// new Worker("messageQ", sendMessage,{connection:redisConnection});
