@@ -1,39 +1,32 @@
-import { createClient } from "redis";
+import dotenv from "dotenv";
+dotenv.config();
+const Env = process.env;
 
-createClient()
-  .on("connect", () => {
-    console.log("redis connected");
-  })
-  .on("error", (err) => {
-    console.log("failed to connect with redis");
-  })
-  .connect();
+import mongoose from "mongoose";
+mongoose
+  .connect(Env.MONGODB_URL!)
+  .then(() => console.log("Database connected"))
+  .catch((error) => {
+    console.log(error);
+  });
 
-import ioRedis from "ioredis"
 import express from "express";
-import { faker } from "@faker-js/faker";
-import { Queue, Worker } from "bullmq";
+import morgan from "morgan";
+import "./util/redis.util";
+import "./util/workers.util"
+import cors from "cors";
 
 const app = express();
-const redisConnection = new ioRedis({maxRetriesPerRequest:null})
-app.listen(8080);
+app.listen(Env.PORT, () =>
+  console.log(`Server is running on port:${Env.PORT}`)
+);
 
-app.post("/message", async (req, res) => {
-  try {
-    const payload = {
-      email: faker.internet.email(),
-      message: faker.lorem.paragraph(),
-    };
-    const messageQ = new Queue("messageQ");
-    await messageQ.add("sendMessage", payload);
-    res.json({ message: "Task added to queue" });
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
-// const sendMessage = (job:any) => {
-//   console.log(job.data);
-// };
-
-// new Worker("messageQ", sendMessage,{connection:redisConnection});
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(morgan("dev"));
