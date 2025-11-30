@@ -16,6 +16,8 @@ import "./util/redis.util";
 import "./util/workers.util"
 import cors from "cors";
 
+import  messageRouter from "./message/message.router"
+
 const app = express();
 app.listen(Env.PORT, () =>
   console.log(`Server is running on port:${Env.PORT}`)
@@ -30,3 +32,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
+
+app.use("/message",messageRouter)
+
